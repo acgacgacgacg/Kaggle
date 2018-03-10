@@ -31,9 +31,9 @@ def optimistic_restore(session, save_file):
 
 # Paths
 # path = '/media/aldin/2EA2E320A2E2EAF3/ML/CDiscount Image Classification/'
-path = '/home/aldin/Desktop/'
-filewriter_path = path + 'summary/'
-checkpoint_path = path + 'checkpoints/'
+
+filewriter_path = 'summary/'
+checkpoint_path = 'checkpoints/'
 # example_path = path + 'example/'
 example_path = '/home/aldin/Desktop/output_file.tfrecords'
 
@@ -44,40 +44,6 @@ percent_for_train = 0.98
 _WEIGHT_DECAY = 1e-4
 _MOMENTUM = 0.9
 
-
-# Transfer category code to No.
-# category_to_int = dict()
-# with open(path + 'category_names.csv') as csvfile:
-#     i = 0
-#     reader = csv.DictReader(csvfile, delimiter=',')
-#     for row in reader:
-#         category_to_int[row['category_id']] = i
-#         i += 1
-
-# # datalist for training and validation
-# prod_to_category = np.load(path + 'prod_to_category.npy')
-# image_list = [f for f in os.listdir(path + 'example')]
-
-# # ----------- ↓↓These codes will cause the disk usage boost to 100%! ↓↓----------#
-# # np.random.seed(0)
-# # np.random.shuffle(image_list)
-# # np.random.seed(0)
-# # ----------- ↑↑These codes will cause the disk usage boost to 100%! ↑↑----------#
-
-# label_list = [int(prod_to_category.item().get(f.split('-')[0]))
-#               for f in image_list]
-
-# num_samples = len(image_list)
-# num_classes = len(category_to_int)
-# num_training = int(num_samples * percent_for_train)
-
-# # datalist for training
-# train_image_list = image_list[:num_training]
-# train_label_list = label_list[:num_training]
-
-# # datalist for validation
-# val_image_list = image_list[num_training:]
-# val_label_list = label_list[num_training:]
 
 num_classes = 5270
 # Place data loading and preprocessing on the cpu
@@ -127,7 +93,7 @@ with tf.name_scope("train"):
 
     # Multiply the learning rate by 0.1 at 30, 60, 80, and 90 epochs.
     boundaries = [
-        int(train_batches_per_epoch * epoch) for epoch in [10, 20, 40, 60]]
+        int(train_batches_per_epoch * epoch) for epoch in [5, 6, 7, 60]]
     values = [
         initial_learning_rate * decay for decay in [1, 0.1, 0.01, 1e-3, 1e-4]]
     learning_rate = tf.train.piecewise_constant(
@@ -177,9 +143,9 @@ with tf.Session() as sess:
 
     # Load the pretrained weights into the non-trainable layer
     # When execute first time
-    # optimistic_restore(sess, checkpoint_path + 'ResNet-L50.ckpt')
+    optimistic_restore(sess, checkpoint_path + 'ResNet-L50.ckpt')
     # Else
-    latest = tf.train.latest_checkpoint(checkpoint_path)
+    # latest = tf.train.latest_checkpoint(checkpoint_path)
     if latest is not None:
         print("resume", latest)
         saver.restore(sess, latest)
